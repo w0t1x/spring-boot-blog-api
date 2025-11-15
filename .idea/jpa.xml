@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PersistenceUnitSettings">
+    <persistence-units>
+      <persistence-unit moduleName="usingSpringDataJPA" name="usingSpringDataJPA" framework="JPA" ormUnit="usingSpringDataJPA:usingSpringDataJPA" defaultDataSourceId="94d1b23f-2dd0-4236-a493-45b0f97872e5" />
+    </persistence-units>
+  </component>
+</project>
