@@ -2,12 +2,14 @@ package org.example.service;
 
 import org.example.dto.CreatePostRequestDTO;
 import org.example.dto.PostResponseDTO;
+import org.example.dto.TagUsageDTO;
 import org.example.dto.mapper.PostMapper;
 import org.example.model.Post;
 import org.example.model.Tag;
 import org.example.model.User;
 import org.example.storage.comment.CommentDbStorage;
 import org.example.storage.post.PostDbStorage;
+import org.example.storage.post.PostSummaryProjection;
 import org.example.storage.post.TagUsingProection;
 import org.example.storage.tag.TagDbStorage;
 import org.example.storage.user.UserDbStorage;
@@ -65,6 +67,11 @@ public class BlogService {
         return PostMapper.toDto(create);
     }
 
+    @Transactional
+    public Page<PostSummaryProjection> findAllBy(Pageable pageable) {
+        return postDbStorage.findAllBy(pageable);
+    }
+
     @Transactional(readOnly = true)
     public Page<PostResponseDTO> getPostsByAuthor(Long authorId, Pageable pageable) {
         return postDbStorage.findByAuthorId(authorId, pageable).map(PostMapper::toDto);
@@ -117,5 +124,10 @@ public class BlogService {
     public void deletePostWithComments(Long postId) {
         commentDbStorage.deleteAllByPostId(postId);
         postDbStorage.deleteById(postId);
+    }
+
+    @Transactional
+    public List<TagUsageDTO> findTagUsageStats() {
+        return tagDbStorage.findTagUsageStats();
     }
 }

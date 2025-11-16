@@ -1,5 +1,6 @@
 package org.example.storage.tag;
 
+import org.example.dto.TagUsageDTO;
 import org.example.model.Tag;
 import org.springframework.stereotype.Repository;
 
@@ -24,5 +25,9 @@ public class TagDbStorage {
 
     public List<Tag> findByNameStartingWith(String prefix){
         return tagStorage.findByNameStartingWith(prefix);
+    }
+
+    public List<TagUsageDTO> findTagUsageStats(){
+        return tagStorage.findTagUsageStats();
     }
 }

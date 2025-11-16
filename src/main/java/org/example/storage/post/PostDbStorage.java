@@ -16,6 +16,10 @@ public class PostDbStorage{
         this.postStorage = postStorage;
     }
 
+    public Page<PostSummaryProjection> findAllBy(Pageable pageable) {
+        return postStorage.findAllBy(pageable);
+    }
+
     public Post createPost(Post post){
         return postStorage.save(post);
     }

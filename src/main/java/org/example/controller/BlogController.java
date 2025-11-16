@@ -2,7 +2,9 @@ package org.example.controller;
 
 import org.example.dto.CreatePostRequestDTO;
 import org.example.dto.PostResponseDTO;
+import org.example.dto.TagUsageDTO;
 import org.example.service.BlogService;
+import org.example.storage.post.PostSummaryProjection;
 import org.example.storage.post.TagUsingProection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -89,5 +91,15 @@ public class BlogController {
     @DeleteMapping("/posts/{id}")
     public void deletePost(@PathVariable Long id) {
         blogService.deletePostWithComments(id);
+    }
+
+    @GetMapping("/stats/tags/usage")
+    public List<TagUsageDTO> findTagUsageStats(){
+        return blogService.findTagUsageStats();
+    }
+
+    @GetMapping("/summary/projection")
+    public Page<PostSummaryProjection> findAllBy(Pageable pageable) {
+        return blogService.findAllBy(pageable);
     }
 }
