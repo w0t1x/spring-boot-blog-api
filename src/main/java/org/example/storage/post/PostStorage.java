@@ -15,6 +15,8 @@ import java.util.List;
 @Repository
 public interface PostStorage extends JpaRepository<Post, Long> {
 
+    Page<PostSummaryProjection> findAllBy(Pageable pageable);
+
     Page<Post> findByAuthorId(Long authorId, Pageable pageable);
 
     List<Post> findByTagsName(String tagName);
