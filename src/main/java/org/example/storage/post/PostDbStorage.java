@@ -1,6 +1,8 @@
 package org.example.storage.post;
 
 import org.example.model.Post;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -14,14 +16,6 @@ public class PostDbStorage{
         this.postStorage = postStorage;
     }
 
-    public List<Post> authorId(Long id){
-        return postStorage.findByAuthorId(id);
-    }
-
-    public List<Post> tagName(String tagName){
-        return postStorage.findByTagsName(tagName);
-    }
-
     public Post createPost(Post post){
         return postStorage.save(post);
     }
@@ -30,16 +24,16 @@ public class PostDbStorage{
         postStorage.deleteById(id);
     }
 
-    public List<Post> findByAuthorId(Long authorId) {
-        return postStorage.findByAuthorId(authorId);
+    public Page<Post> findByAuthorId(Long authorId, Pageable pageable) {
+        return postStorage.findByAuthorId(authorId, pageable);
     }
 
-    public List<Post> searchByTitle(String text) {
-        return postStorage.findByTitleContainingIgnoreCase(text);
+    public Page<Post> searchByTitle(String text, Pageable pageable) {
+        return postStorage.findByTitleContainingIgnoreCase(text, pageable);
     }
 
-    public List<Post> findTop3ByAuthor(Long authorId) {
-        return postStorage.findTop3ByAuthorIdOrderByCreatedAtDesc(authorId);
+    public Page<Post> findTop3ByAuthor(Long authorId, Pageable pageable) {
+        return postStorage.findTop3ByAuthorIdOrderByCreatedAtDesc(authorId, pageable);
     }
 
     public List<Post> findByTagName(String tagName) {

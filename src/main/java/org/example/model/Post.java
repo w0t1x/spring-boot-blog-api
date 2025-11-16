@@ -24,6 +24,9 @@ public class Post {
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Version
+    private Long version;
+
     @ManyToOne(fetch = FetchType.LAZY) // желательно LAZY, чтобы не тянуть автора всегда
     @JoinColumn(name = "author_id", nullable = false)
     private User author;

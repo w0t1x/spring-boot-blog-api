@@ -1,5 +1,8 @@
 package org.example.service;
 
+import org.example.dto.CreatePostRequestDTO;
+import org.example.dto.PostResponseDTO;
+import org.example.dto.mapper.PostMapper;
 import org.example.model.Post;
 import org.example.model.Tag;
 import org.example.model.User;
@@ -8,6 +11,8 @@ import org.example.storage.post.PostDbStorage;
 import org.example.storage.post.TagUsingProection;
 import org.example.storage.tag.TagDbStorage;
 import org.example.storage.user.UserDbStorage;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,16 +35,16 @@ public class BlogService {
     }
 
     @Transactional
-    public Post createPostTagFilm(Long authorId, String title, String content, List<String> tagNames) {
-        User author = userDbStorage.findById(authorId)
-                .orElseThrow(() -> new NullPointerException("Пользователя с таким id = " + authorId + " не найден"));
+    public PostResponseDTO createPostTagFilm(CreatePostRequestDTO request) {
+        User author = userDbStorage.findById(request.getAuthorId())
+                .orElseThrow(() -> new NullPointerException("Пользователя с таким id = " + request.getAuthorId() + " не найден"));
 
-        Post post = new Post(title, content);
+        Post post = new Post(request.getTitle(), request.getContent());
         post.setAuthor(author);
         author.addPost(post);
 
-        if (tagNames != null) {
-            for (String tagName : tagNames) {
+        if (request.getTagNames() != null) {
+            for (String tagName : request.getTagNames()) {
                 if (tagName == null || tagName.isBlank()) {
                     continue;
                 }
@@ -56,42 +61,51 @@ public class BlogService {
             }
         }
 
-        return postDbStorage.createPost(post);
+        Post create = postDbStorage.createPost(post);
+        return PostMapper.toDto(create);
     }
 
     @Transactional(readOnly = true)
-    public List<Post> getPostsByAuthor(Long authorId) {
-        return postDbStorage.findByAuthorId(authorId);
+    public Page<PostResponseDTO> getPostsByAuthor(Long authorId, Pageable pageable) {
+        return postDbStorage.findByAuthorId(authorId, pageable).map(PostMapper::toDto);
     }
 
     @Transactional(readOnly = true)
-    public List<Post> searchPostsByTitle(String text) {
-        return postDbStorage.searchByTitle(text);
+    public Page<PostResponseDTO> searchPostsByTitle(String text, Pageable pageable) {
+        return postDbStorage.searchByTitle(text, pageable).map(PostMapper::toDto);
     }
 
     @Transactional(readOnly = true)
-    public List<Post> getTop3PostsByAuthor(Long authorId) {
-        return postDbStorage.findTop3ByAuthor(authorId);
+    public Page<PostResponseDTO> getTop3PostsByAuthor(Long authorId, Pageable pageable) {
+        return postDbStorage.findTop3ByAuthor(authorId, pageable).map(PostMapper::toDto);
     }
 
     @Transactional(readOnly = true)
-    public List<Post> getPostsByTag(String tagName) {
-        return postDbStorage.findByTagName(tagName);
+    public List<PostResponseDTO> getPostsByTag(String tagName) {
+        return postDbStorage.findByTagName(tagName).stream()
+                .map(PostMapper::toDto)
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<Post> getPostsByAuthorEmail(String email) {
-        return postDbStorage.findPostsByAuthorEmail(email);
+    public List<PostResponseDTO> getPostsByAuthorEmail(String email) {
+        return postDbStorage.findPostsByAuthorEmail(email).stream()
+                .map(PostMapper::toDto)
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<Post> getPostsBetween(LocalDateTime from, LocalDateTime to) {
-        return postDbStorage.findPostsBetween(from, to);
+    public List<PostResponseDTO> getPostsBetween(LocalDateTime from, LocalDateTime to) {
+        return postDbStorage.findPostsBetween(from, to).stream()
+                .map(PostMapper::toDto)
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<Post> getPostsWithoutComments() {
-        return postDbStorage.findPostsWithoutComments();
+    public List<PostResponseDTO> getPostsWithoutComments() {
+        return postDbStorage.findPostsWithoutComments().stream()
+                .map(PostMapper::toDto)
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -100,7 +114,7 @@ public class BlogService {
     }
 
     @Transactional
-    public void deletePostWithComments(Long postId){
+    public void deletePostWithComments(Long postId) {
         commentDbStorage.deleteAllByPostId(postId);
         postDbStorage.deleteById(postId);
     }

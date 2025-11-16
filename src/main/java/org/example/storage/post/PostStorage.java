@@ -1,6 +1,9 @@
 package org.example.storage.post;
 
 import org.example.model.Post;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,13 +15,13 @@ import java.util.List;
 @Repository
 public interface PostStorage extends JpaRepository<Post, Long> {
 
-    List<Post> findByAuthorId(Long authorId);
+    Page<Post> findByAuthorId(Long authorId, Pageable pageable);
 
     List<Post> findByTagsName(String tagName);
 
-    List<Post> findByTitleContainingIgnoreCase(String text);
+    Page<Post> findByTitleContainingIgnoreCase(String text, Pageable pageable);
 
-    List<Post> findTop3ByAuthorIdOrderByCreatedAtDesc(Long authorId);
+    Page<Post> findTop3ByAuthorIdOrderByCreatedAtDesc(Long authorId, Pageable pageable);
 
     @Query("""
             select p from Post p
@@ -29,7 +32,7 @@ public interface PostStorage extends JpaRepository<Post, Long> {
     @Query("""
             select p from Post p
             where p.createdAt between :from and :to
-            order by p.createdAt desc           
+            order by p.createdAt desc
             """)
     List<Post> findPostsBetween(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
 
@@ -45,7 +48,7 @@ public interface PostStorage extends JpaRepository<Post, Long> {
             from Post p
             join p.tags t
             group by t.name
-            order by postCount desc           
+            order by postCount desc
             """)
     List<TagUsingProection> findTagUsageStats();
 }
